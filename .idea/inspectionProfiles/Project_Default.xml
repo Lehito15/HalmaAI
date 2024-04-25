@@ -1,0 +1,18 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="str.__sub__" />
+          <option value="tuple.company" />
+          <option value="tuple.line" />
+          <option value="tuple.departure_time" />
+          <option value="tuple.arrival_time" />
+          <option value="tuple.start_stop" />
+          <option value="tuple.end_stop" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
