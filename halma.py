@@ -9,8 +9,8 @@ class Halma:
     def __init__(self):
 
         self.board = []
-        self.player2 = Player(2)
-        self.player1 = Player(1)
+        self.player2 = Player()
+        self.player1 = Player()
         self.moves = set()
         self.base1 = {(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (2, 0), (2, 1),
                       (2, 2), (2, 3), (3, 0), (3, 1), (3, 2), (4, 0), (4, 1)}
@@ -19,6 +19,7 @@ class Halma:
                       (13, 15), (13, 14), (13, 13), (13, 12), (12, 15), (12, 14), (12, 13), (11, 15), (11, 14)}
 
     def read_board_from_file(self, file):
+        self.board = []
         try:
             with open(file, 'r') as f:
                 lines = f.readlines()
@@ -27,7 +28,6 @@ class Halma:
                     self.board.append(row)
         except FileNotFoundError:
             print('nie ma pliku')
-        # print(type(self.board[0][0]))
 
     def check_winner(self):
         win2 = all(self.board[x][y] == 2 for x, y in self.base1)
@@ -51,6 +51,7 @@ class Halma:
             x, y = pos_old
             x_new, y_new = pos_new
             temp = self.board[x][y]
+            # print(temp, 'ruch')
             self.board[x][y] = self.board[x_new][y_new]
             self.board[x_new][y_new] = temp
 
@@ -74,86 +75,56 @@ class Halma:
             if self.board[x][y] == 0:
                 self.board[x][y] = 2
                 number_of_2 += 1
-        self.print_board()
 
     def game(self):
         while self.check_winner() is None:
-            move_2 = self.player2.minmax(([], self.board), 1, False,self.player2.evaluate)
+            move_2 = self.player2.minmax(([], self.board), 1, True, self.player2.strategy_offensive)
             self.make_move1(move_2)
             print('ruch 2')
-            move_1 = self.player1.minmax(([], self.board), 1, True,  self.player1.evaluate)
+            move_1 = self.player1.minmax(([], self.board), 1, False, self.player1.strategy_offensive)
             self.make_move1(move_1)
             print('ruch 1')
             self.print_board()
-            # move_2 = self.player2.minmax(([], self.board), 1, False)
-            # self.make_move1(move_2)
-            # print('ruch 2')
         print(self.check_winner())
 
-    def game_alpha_beta(self, depth):
-        rounds = 0;
+    def game_alpha_beta(self, depth, h1, h2):
+        rounds = 0
         while self.check_winner() is None:
-            # move_2 = self.player2.minimax_alpha_beta(([], self.board), depth, False, self.player2.evaluate1,
-            #                                          float('-inf'), float('inf'))
-            # self.make_move1(move_2)
-            # print('ruch 2')
-            # self.print_board()
-            move_1 = self.player1.minimax_alpha_beta(([], self.board), depth, True, self.player1.evaluate3, float('-inf'), float('inf'))
-            self.make_move1(move_1)
-            print('ruch 1')
-            self.print_board()
-            move_2 = self.player2.minimax_alpha_beta(([], self.board), depth, False, self.player2.evaluate1, float('-inf'), float('inf'))
+            move_2 = self.player2.minimax_alpha_beta(([], self.board), depth, False, h2, float('-inf'), float('inf'))
             self.make_move1(move_2)
-            print('ruch 2')
-            self.print_board()
-            # move_2 = self.player2.minmax(([], self.board), 1, False)
+            # print('ruch 2')
+            # self.print_board()
+            move_1 = self.player1.minimax_alpha_beta(([], self.board), depth, True, h1, float('-inf'), float('inf'))
+            self.make_move1(move_1)
+            # print('ruch 1')
+            # self.print_board()
+            # move_2 = self.player2.minimax_alpha_beta(([], self.board), depth, False, h2, float('-inf'), float('inf'))
             # self.make_move1(move_2)
             # print('ruch 2')
             # self.print_board()
-            rounds += 1
-            print(rounds)
-        print(self.check_winner())
-        print(rounds)
 
-    def test(self):
-        self.player1.minimax_alpha_beta(([], self.board), 4, True, self.player1.evaluate, float('-inf'), float('inf'))
+            rounds += 1
+            if rounds > 300:
+                points_1 = self.player1.count_pawns_in_base(self.board, self.player1.base2, 1)
+                points_2 = self.player1.count_pawns_in_base(self.board, self.player1.base1, 2)
+                if points_1 > points_2:
+                    return 1
+                elif points_2 > points_1:
+                    return 2
+                else:
+                    return 0
+
+            # print(rounds)
+        # print(self.check_winner())
+        # print(rounds)
+        return self.check_winner()
 
 
 if __name__ == "__main__":
     halma = Halma()
-    # halma.read_board_from_file('halmaWinner.txt')
-    halma.generate_random_board()
-    # halma.possile_moves(4, 0, 0)
-    # # print(halma.moves)
-    # # print(halma.check_winner())
-    # # halma.game()
-    # halma.all_possible_moves(1)
-    # halma.print_board()# print(len(halma.base1))
-    # # halma.make_move((4,0), (5,0))
-    # print('nowa')
-    # halma.print_board()
-    # halma.player.make_move(halma.board, (4,0), (5,0))
-    # halma.player.all_possible_moves(halma.board, 1)
-    # a = halma.player1.minmax(([], halma.board), 2, True)
-    # print(a)
-    # alpha = halma.player1.minimax_alpha_beta(([], halma.board),2, True, float('-inf'), float('inf'))
-    # print(alpha)
-
-    start_time = time.time()
-    a = halma.player1.minmax(([], halma.board), 2, True, halma.player1.evaluate)
-    end_time = time.time()
-    execution_time_minmax = end_time - start_time
-    print(a)
-    halma.generate_random_board()
-
-    start_time = time.time()
-    alpha = halma.player1.minimax_alpha_beta(([], halma.board), 2, True, halma.player1.evaluate, float('-inf'), float('inf'))
-    end_time = time.time()
-    execution_time_alpha_beta = end_time - start_time
-    print(alpha)
-    print("Czas wykonania algorytmu Minimax:", execution_time_minmax)
-    print("Czas wykonania algorytmu Minimax z cięciami alfa-beta:", execution_time_alpha_beta)
-    # halma.game_alpha_beta(2)
-    # halma.player1.minimax_alpha_beta(([],halma.board), 2,True,halma.player1.evaluate, float('-inf'), float('inf'))
+    halma.read_board_from_file('halmaWinner.txt')
     # halma.generate_random_board()
-    # halma.player1.test(([],halma.board), halma.player1.evaluate)
+
+    a  = halma.game_alpha_beta(2, halma.player1.strategy_ofensivev2, halma.player1.strategy_go_in_group)
+    print(a)
+

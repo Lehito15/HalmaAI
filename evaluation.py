@@ -2,66 +2,54 @@ def manhatan(point_x, point_y, x, y):
     return abs(point_x - x) + abs(point_y - y)
 
 
-def manhatan_2(point_x, point_y, x, y, board, base, player_type):
+def random_empty_base(board, base, x, y, player_type):
     if player_type == 1:
-        empty_base = all(board[x][y] == 0 or board[x][y] == 2 for x, y in base)
+        pos_x = 15
+        pos_y = 15
     else:
-        empty_base = all(board[x][y] == 0 or board[x][y] == 1 for x, y in base)
-    if empty_base:
-        # print('empty',player_type)
-        return manhatan(point_x, point_y, x, y)
-    else:
-        if board[x][y] in base:
-            return abs(point_x - x) + abs(point_y - y)
-        else:
-            return abs(point_x - x) + abs(point_y - y) * 5
+        pos_y = 0
+        pos_x = 0
+
+    for field in base:
+        x_1, x_2 = field
+        if board[x_1][x_2] != 0:
+            pos_x = x_1
+            pos_y = x_2
+            break
+    # print(pos_x, pos_y)
+    return manhatan(pos_x, pos_y, x, y)
 
 
-def if_in_base(player_type, base, board, x, y):
+def rival_base(base, x, y):
+    if (x, y) in base:
+        return 5
+    return 0
+
+
+def leave_base1(player_type, x, y, base):
     if (x, y) in base:
         if player_type == 1:
-            return -100
+            d = (abs(-int(x) - int(y) + 6)) / (2 ** 0.5)
+            return d * 10
         else:
-            return 100
+            d = (abs(-int(x) - int(y) + 24)) / (2 ** 0.5)
+            return d * 10
     return 0
 
 
-def leave_base(player_type, state, base):
-    if state[0]:
-        if state[0][0][0] in base:
-            if state[0][0][1] not in base:
-                if player_type == 1:
-                    return 4
-                else:
-                    return -4
-        return 0
-    return 0
 
 
-def rival_base(player_type, board, base, x, y):
-    if (x, y) in base:
-        if player_type == 1:
-            return 5
-        else:
-            return -5
-    return 0
 
-
-def go_in_group(player_type, board, base, x, y):
+def go_in_group1(player_type, board, x, y, base, bonus):
     value = 0
-    if (x, y) not in base:
-        for i in range(-1, 2):
-            for j in range(-1, 2):
-                if board[i][j] == player_type:
-                    if player_type == 1:
-                        value += 1
-                    else:
-                        value -= 1
-                else:
-                    if player_type == 1:
-                        value -= 1
-                    else:
-                        value += 1
-    # else:
-    #     value = 4
+    if (x, y) in base:
+        # print('tal')
+        return 0
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            x_new = x + i
+            y_new = y + j
+            if 0 < x_new < 16 and 0 < y_new < 16:
+                if board[1][x_new][y_new] == player_type and (x_new, y_new) not in base:
+                    value += bonus
     return value
